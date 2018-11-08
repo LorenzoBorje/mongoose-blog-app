@@ -94,6 +94,21 @@ app.put('/blog-posts/:id', (req, res) => {
 
 });
 
+
+app.delete('/blog-posts/:id', (req, res) => {
+  Posts
+    .findByIdAndRemove(req.params.id)
+    .then(post => res.status(204).end())
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({message: 'Internal server error'});
+    })
+})
+
+app.use("*", function(req, res) {
+  res.status(404).json({ message: "Not Found" });
+});
+
 function runServer(databaseUrl, port = PORT) {
   return new Promise((resolve, reject) => {
     mongoose.connect(
