@@ -97,9 +97,23 @@ app.put('/authors/:id', (req, res) => {
       console.error(err);
       res.status(500).json({message: 'Internal server error'});
     });
-;
+});
 
-})
+app.delete('/authors/:id', (req, res) => {
+  BlogPosts
+    .remove({author: req.params.id})
+    .then(() => {
+      Authors
+        .findByIdAndRemove(req.params.id)
+        .then(() => {
+          res.status(204).end();
+      });   
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({message: 'Internal server error'});
+    });
+});
 
 app.get('/blog-posts', (req, res) => {
   BlogPosts.find()
