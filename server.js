@@ -9,6 +9,7 @@ mongoose.Promise = global.Promise;
 
 const { PORT, DATABASE_URL } = require('./config');
 const { BlogPosts } = require('./models');
+const { Authors } = require('./models');
 
 const app = express();
 app.use(express.json());
@@ -41,7 +42,7 @@ app.get('/blog-posts/:id', (req, res) => {
 
 app.post('/blog-posts', (req, res) => {
   
-  const requiredFields = ['title', 'content', 'author'];
+  const requiredFields = ['title', 'content', 'author_id'];
   requiredFields.forEach(field => {
     if (!(field in req.body)) {
       const message = `Missing ${field} in request body`;
@@ -49,20 +50,31 @@ app.post('/blog-posts', (req, res) => {
       return res.status(400).send(message);
     }
   });
-  
-  BlogPosts.create({
-    title: req.body.title,
-    content: req.body.content,
-    author: {
-      firstName: req.body.author.firstName,
-      lastName: req.body.author.lastName
-    }
-  })
-    .then(post => res.status(201).json(post.serialize()))
+
+  // checks if author_id is valid
+  Authors.findById(req.body.author_id)
+    .then(author => {
+      if (author) {
+        BlogPosts.create({
+          title: req.body.title,
+          content: req.body.content,
+          author: req.body.author_id
+        })
+        .then(post => res.status(201).json({
+          id: post.id,
+          title: post.title,
+          content: post.content,
+          author: `${author.firstName} ${author.lastName}`,
+          comments: post.comments
+        }))
+        .catch(err => {
+          res.status(500).json({message: "Internal server error"});
+        });
+      }
+    })
     .catch(err => {
-      console.error(err);
-      res.status(500).json({message: "Internal server error"});
-    });
+      res.status(400).json({message: "Invalid author_id"});
+  });
 
 });
 
@@ -76,7 +88,7 @@ app.put('/blog-posts/:id', (req, res) => {
   }
 
   const toUpdate = {}
-  const updatableFields = ['title', 'content', 'author'];
+  const updatableFields = ['title', 'content'];
 
   updatableFields.forEach(field => {
     if (field in req.body) {

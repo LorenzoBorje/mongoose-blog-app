@@ -46,6 +46,6 @@ postSchema.pre('findOne', function(next) {
 
 
 const BlogPosts = mongoose.model("BlogPosts", postSchema);
-const Author = mongoose.model("Author", authorSchema);
+const Authors = mongoose.model("Author", authorSchema);
 
-module.exports = { BlogPosts };
+module.exports = { BlogPosts, Authors };
