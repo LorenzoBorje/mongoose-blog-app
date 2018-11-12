@@ -27,23 +27,39 @@ app.post('/authors', (req, res) => {
     }
   });
 
-  Authors
-    .create({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      userName: req.body.userName
-    })
+  Authors.findOne({userName: req.body.userName})
     .then(author => {
-      res.status(200).json({
-        _id: author.id,
-        name: `${author.firstName} ${author.lastName}`,
-        userName: author.userName
-      });
+      if (author) {
+        const message = `User name already taken`
+        console.error(message);
+        res.status(400).send(message);
+      } else {
+        Authors
+          .create({
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            userName: req.body.userName
+          })
+          .then(author => {
+            res.status(200).json({
+              _id: author.id,
+              name: `${author.firstName} ${author.lastName}`,
+              userName: author.userName
+            });
+          })
+          .catch(err => {
+            console.error(err);
+            res.status(500).json({message: 'Internal server error'});
+          });
+      }
     })
     .catch(err => {
       console.error(err);
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({ error: 'Internal server error' });
     });
+
+
+  
   
 
 });
