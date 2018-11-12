@@ -8,7 +8,7 @@ mongoose.Promise = global.Promise;
 
 
 const { PORT, DATABASE_URL } = require('./config');
-const { Posts } = require('./models');
+const { BlogPosts } = require('./models');
 
 const app = express();
 app.use(express.json());
@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(morgan('common'));
 
 app.get('/blog-posts', (req, res) => {
-  Posts.find()
+  BlogPosts.find()
     .then(posts => {
       res.json({
         posts: posts.map(post => post.serialize())
@@ -29,7 +29,7 @@ app.get('/blog-posts', (req, res) => {
 });
 
 app.get('/blog-posts/:id', (req, res) => {
-  Posts.findById(req.params.id)
+  BlogPosts.findById(req.params.id)
     .then(post => res.json(post.serialize()))
     .catch(err => {
       console.log(err);
@@ -48,7 +48,7 @@ app.post('/blog-posts', (req, res) => {
     }
   });
   
-  Posts.create({
+  BlogPosts.create({
     title: req.body.title,
     content: req.body.content,
     author: {
@@ -83,7 +83,7 @@ app.put('/blog-posts/:id', (req, res) => {
   });
   
   
-  Posts
+  BlogPosts
     .findByIdAndUpdate(req.body.id, {$set: toUpdate})
     .then(post => res.status(200).json(post.serialize()))
     .catch(err => {
@@ -96,7 +96,7 @@ app.put('/blog-posts/:id', (req, res) => {
 
 
 app.delete('/blog-posts/:id', (req, res) => {
-  Posts
+  BlogPosts
     .findByIdAndRemove(req.params.id)
     .then(post => res.status(204).end())
     .catch(err => {
