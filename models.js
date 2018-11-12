@@ -29,7 +29,8 @@ postSchema.methods.serialize = function() {
     id: this._id,
     title: this.title,
     content: this.content,
-    author: this.authorName
+    author: this.authorName,
+    comments: this.comments
   };
 };
 
@@ -37,6 +38,12 @@ postSchema.pre('find', function(next) {
   this.populate('author');
   next();
 })
+
+postSchema.pre('findOne', function(next) {
+  this.populate('author');
+  next();
+})
+
 
 const BlogPosts = mongoose.model("BlogPosts", postSchema);
 const Author = mongoose.model("Author", authorSchema);

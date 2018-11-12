@@ -15,6 +15,8 @@ app.use(express.json());
 
 app.use(morgan('common'));
 
+// adding comments
+
 app.get('/blog-posts', (req, res) => {
   BlogPosts.find()
     .then(posts => {
