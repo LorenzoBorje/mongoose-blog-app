@@ -16,7 +16,37 @@ app.use(express.json());
 
 app.use(morgan('common'));
 
-// adding comments
+app.post('/authors', (req, res) => {
+  
+  const requiredFields = ['firstName', 'lastName', 'userName'];
+  requiredFields.forEach(field => {
+    if (!(field in req.body)) {
+      const message = `Required field ${field} not in request body`
+      console.error(message);
+      res.status(400).send(message);
+    }
+  });
+
+  Authors
+    .create({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      userName: req.body.userName
+    })
+    .then(author => {
+      res.status(200).json({
+        _id: author.id,
+        name: `${author.firstName} ${author.lastName}`,
+        userName: author.userName
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({message: 'Internal server error'});
+    });
+  
+
+});
 
 app.get('/blog-posts', (req, res) => {
   BlogPosts.find()
